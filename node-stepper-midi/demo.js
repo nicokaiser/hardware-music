@@ -1,6 +1,6 @@
 'use strict';
 
-var StepperPlayer = require('./stepper-player.js').StepperPlayer;
+var StepperPlayer = require('./lib/stepper-player').StepperPlayer;
 var stepperPlayer = new StepperPlayer('/dev/ttyACM0');
 
 stepperPlayer.on('connect', function () {
