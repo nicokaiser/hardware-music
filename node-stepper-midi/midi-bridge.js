@@ -8,7 +8,6 @@ var StepperPlayer = require('./lib/stepper-player').StepperPlayer;
 // Configuration
 
 var midiPort = 1; // real MIDI port (or false)
-var midiName = 'Hardware Music'; // "Hardware Music"
 var device = '/dev/ttyACM0'; // /dev/ttyACM0
 
 
@@ -46,15 +45,6 @@ if (typeof midiPort === "number") {
 }
 
 
-// Virtual MIDI port
-
-console.log('Listening on virtual MIDI port "%s"', midiName);
-var vinput = new midi.input();
-vinput.openVirtualPort(midiName);
-vinput.ignoreTypes(false, false, false);
-vinput.on('message', onMessage);
-
-
 // Output to StepperPlayer
 
 console.log('Connecting to StepperPlayer on %s', device);
@@ -72,7 +62,6 @@ stepperPlayer.on('error', function (err) {
 
 process.on('SIGTERM', function () {
     if (input) input.closePort();
-    vinput.closePort();
 
     if (stepperPlayer) {
         stepperPlayer.off();
