@@ -27,7 +27,7 @@ var StepperPlayer = function(path) {
                 self.emit('connect');
             }
 
-            console.log('TODO: Parse response: ' + data);
+            //console.log('TODO: Parse response: ' + data);
         });
     });
 };
