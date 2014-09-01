@@ -12,6 +12,7 @@ var device = '/dev/ttyACM0'; // /dev/ttyACM0
 
 
 var stepperPlayer;
+var currentNote = false;
 
 
 // Handle MIDI events
@@ -19,12 +20,17 @@ var stepperPlayer;
 function onMessage(deltaTime, message) {
     if (message[0] === 0x80 || message[0] === 0x90 && message[2] === 0) {
         console.log('Note Off: %d', message[1]);
-        if (stepperPlayer) stepperPlayer.off();
+        if (currentNote === message[1]) {
+            stepperPlayer.off();
+            currentNote = false;
+        }
+        stepperPlayer.off();
     } else if (message[0] === 0x90) {
         var freq = MIDIUtils.noteNumberToFrequency(message[1]);
         var noteName = MIDIUtils.noteNumberToName(message[1]);
         console.log('Note On:  %d (%s, %d Hz)', message[1], noteName, freq);
-        if (stepperPlayer) stepperPlayer.play(freq);
+        stepperPlayer.play(freq);
+        currentNote = message[1];
     }
 }
 
@@ -54,7 +60,6 @@ stepperPlayer.on('connect', function () {
 });
 stepperPlayer.on('error', function (err) {
     console.error('StepperPlayer: ' + err.message);
-    stepperPlayer = false;
 });
 
 
@@ -63,9 +68,7 @@ stepperPlayer.on('error', function (err) {
 process.on('SIGTERM', function () {
     if (input) input.closePort();
 
-    if (stepperPlayer) {
-        stepperPlayer.off();
-        stepperPlayer.close();
-        // TODO: stepperPlayer.reset()
-    }
+    stepperPlayer.off();
+    stepperPlayer.close();
+    // TODO: stepperPlayer.reset()
 });
