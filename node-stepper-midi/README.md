@@ -29,4 +29,9 @@ pacman -S node python2
 mkdir /app && cd /app
 export PYTHON=$(which python2)
 npm install
+
+# systemd service
+cp systemd/node-stepper-midi.service /etc/systemd/system
+systemctl enable node-stepper-midi
+systemctl start node-stepper-midi
 ```

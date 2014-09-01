@@ -1,0 +1,11 @@
+[Service]
+ExecStart=/usr/bin/node /app/midi-bridge.js
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=node-app
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
