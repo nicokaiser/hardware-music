@@ -7,6 +7,7 @@
     "dependencies": {
         "midi": "~0.9.0",
         "midiutils": "~0.0.4",
+        "rtpmidi": "~0.1.7",
         "serialport": "~1.4.5"
     }
 }
