@@ -13,11 +13,22 @@ var device = '/dev/ttyACM0'; // /dev/ttyACM0
 
 var stepperPlayer;
 var currentNote = false;
+var currentBend = false;
 
 
 // Handle MIDI events
 
 function onMessage(deltaTime, message) {
+    if (message[0] === 0xe0) {
+        var amount = (message[2] * 128 + message[1] - 8192) / 8192;
+        console.log('Pitch Bend: %d', amount);
+        if (currentNote) {
+            var freq = MIDIUtils.noteNumberToFrequency(currentNote);
+            var noteName = MIDIUtils.noteNumberToName(currentNote);
+            console.log('Bend:   %d (%s, %d Hz)', currentNote, noteName, freq);
+            // TODO
+        }
+    }
     if (message[0] === 0x80 || message[0] === 0x90 && message[2] === 0) {
         console.log('Note Off: %d', message[1]);
         if (currentNote === message[1]) {
