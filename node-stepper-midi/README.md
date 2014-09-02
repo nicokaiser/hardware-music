@@ -1,7 +1,7 @@
 # raspberry-midi
 
-Listens on a MIDI port and a local virtual MIDI port, sends notes to StepperPlayer 
-connected to a serial port (e.g. /dev/ttyACM0).
+Listens on a MIDI port, RTP-MIDI (via Bonjour), and a local virtual MIDI port,
+sends notes to StepperPlayer connected to a serial port (e.g. /dev/ttyACM0).
 
 
 ## Installation of M-Audio firmware on Raspberry / Arch Linux
