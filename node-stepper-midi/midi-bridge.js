@@ -70,6 +70,16 @@ function onMessage(deltaTime, message) {
 }
 
 
+// Shutdown handler
+
+function shutdown() {
+    if (input) input.closePort();
+    stepperPlayer.off();
+    stepperPlayer.close();
+    process.exit(0);
+}
+
+
 // MIDI port
 
 var input;
@@ -100,9 +110,5 @@ stepperPlayer.on('error', function (err) {
 
 // Handle process signals
 
-process.on('SIGTERM', function () {
-    if (input) input.closePort();
-
-    stepperPlayer.off();
-    stepperPlayer.close();
-});
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
