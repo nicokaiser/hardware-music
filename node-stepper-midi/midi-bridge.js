@@ -24,7 +24,6 @@ function onMessage(deltaTime, message) {
             stepperPlayer.off();
             currentNote = false;
         }
-        stepperPlayer.off();
     } else if (message[0] === 0x90) {
         var freq = MIDIUtils.noteNumberToFrequency(message[1]);
         var noteName = MIDIUtils.noteNumberToName(message[1]);
