@@ -13,31 +13,45 @@ var device = '/dev/ttyACM0'; // /dev/ttyACM0
 
 var stepperPlayer;
 var currentNote = false;
-var currentBend = false;
 
 
 // Handle MIDI events
 
 function onMessage(deltaTime, message) {
-    if (message[0] === 0xe0) {
+    var freq, noteName;
+
+    // Volume = 0: reset stepperPlayer
+    if (message[0] === 0xb0 && message[1] === 7 && message[2] === 0) {
+        console.log('Reset stepperPlayer');
+        stepperPlayer.reset();
+    }
+
+    // Pitch Bend
+    else if (message[0] === 0xe0) {
         var amount = (message[2] * 128 + message[1] - 8192) / 8192;
         console.log('Pitch Bend: %d', amount);
         if (currentNote) {
-            var freq = MIDIUtils.noteNumberToFrequency(currentNote);
-            var noteName = MIDIUtils.noteNumberToName(currentNote);
+            freq = MIDIUtils.noteNumberToFrequency(currentNote);
+            noteName = MIDIUtils.noteNumberToName(currentNote);
+            // TODO: adjust frequency according to amount
             console.log('Bend:   %d (%s, %d Hz)', currentNote, noteName, freq);
-            // TODO
+            stepperPlayer.play(freq);
         }
     }
-    if (message[0] === 0x80 || message[0] === 0x90 && message[2] === 0) {
+
+    // Note Off
+    else if (message[0] === 0x80 || message[0] === 0x90 && message[2] === 0) {
         console.log('Note Off: %d', message[1]);
         if (currentNote === message[1]) {
             stepperPlayer.off();
             currentNote = false;
         }
-    } else if (message[0] === 0x90) {
-        var freq = MIDIUtils.noteNumberToFrequency(message[1]);
-        var noteName = MIDIUtils.noteNumberToName(message[1]);
+    }
+
+    // Note On
+    else if (message[0] === 0x90) {
+        freq = MIDIUtils.noteNumberToFrequency(message[1]);
+        noteName = MIDIUtils.noteNumberToName(message[1]);
         console.log('Note On:  %d (%s, %d Hz)', message[1], noteName, freq);
         stepperPlayer.play(freq);
         currentNote = message[1];
@@ -80,5 +94,4 @@ process.on('SIGTERM', function () {
 
     stepperPlayer.off();
     stepperPlayer.close();
-    // TODO: stepperPlayer.reset()
 });
