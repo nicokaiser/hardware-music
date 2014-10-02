@@ -9,10 +9,21 @@ var StepperPlayer = require('./lib/stepper-player').StepperPlayer;
 
 var midiPort = 1; // real MIDI port (or false)
 var device = '/dev/ttyACM0'; // /dev/ttyACM0
+var pitchBendCent = 200;
 
 
 var stepperPlayer;
 var currentNote = false;
+var currentBend = 0;
+
+
+// Calculate frequency from MIDI note and pitch bend
+
+function noteToFrequency(note, bend) {
+    var freq = MIDIUtils.noteNumberToFrequency(note);
+    if (! bend) return freq;
+    return freq * Math.pow((Math.pow(2, 1 / 1200)), bend);
+}
 
 
 // Handle MIDI events
@@ -29,11 +40,11 @@ function onMessage(deltaTime, message) {
     // Pitch Bend
     else if (message[0] === 0xe0) {
         var amount = (message[2] * 128 + message[1] - 8192) / 8192;
+        currentBend = amount * pitchBendCent;
         console.log('Pitch Bend: %d', amount);
         if (currentNote) {
-            freq = MIDIUtils.noteNumberToFrequency(currentNote);
+            freq = noteToFrequency(currentNote, currentBend);
             noteName = MIDIUtils.noteNumberToName(currentNote);
-            // TODO: adjust frequency according to amount
             console.log('Bend:   %d (%s, %d Hz)', currentNote, noteName, freq);
             stepperPlayer.play(freq);
         }
@@ -50,7 +61,7 @@ function onMessage(deltaTime, message) {
 
     // Note On
     else if (message[0] === 0x90) {
-        freq = MIDIUtils.noteNumberToFrequency(message[1]);
+        freq = noteToFrequency(message[1], currentBend);
         noteName = MIDIUtils.noteNumberToName(message[1]);
         console.log('Note On:  %d (%s, %d Hz)', message[1], noteName, freq);
         stepperPlayer.play(freq);
